@@ -85,9 +85,9 @@ function model(sides, labels) {
   if (faces.length !== labels.length) throw new Error(`D${sides}: faces incorretas`);
   const group = new THREE.Group();
   group.add(new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-    color: 0x582e8d, metalness: 0.32, roughness: 0.33, flatShading: true, side: THREE.DoubleSide,
+    color: 0x6740a4, metalness: 0.32, roughness: 0.30, flatShading: true, side: THREE.DoubleSide,
   })));
-  group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0xe7bf7e, transparent: true, opacity: 0.92 })));
+  group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0xffd69a, transparent: true, opacity: 0.95 })));
   faces.forEach((face, index) => {
     const label = new THREE.Mesh(
       new THREE.PlaneGeometry(labels[index] === '00' ? 0.82 : 0.73, 0.73),

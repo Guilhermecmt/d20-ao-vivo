@@ -1,5 +1,4 @@
 import './style.css';
-import './dice-picker.css';
 import { createDiceStage } from './dice.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://d20-sala-api-guilherme.adroitmixer16.chatgpt.site';
