@@ -304,10 +304,19 @@ ui.leave.addEventListener('click', () => {
   clearInterval(pollTimer);
   location.href = `${location.pathname}${location.search}`;
 });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && room) {
+    if (rolling && currentRoll && Date.now() + serverOffset >= currentRoll.at + 2400) {
+      finishRoll(currentRoll.sequence);
+    }
+    sync();
+  }
+});
 
 const invitation = cleanCode(new URLSearchParams(location.hash.slice(1)).get('sala') || '');
 if (invitation) {
   ui.roomCode.value = invitation;
+  ui.nickname.value = '';
   ui.lobbyHelp.textContent = 'Convite recebido. Digite o nome do personagem e clique em Entrar.';
   ui.nickname.focus();
 }
