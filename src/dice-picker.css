@@ -1,0 +1,35 @@
+.dice-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin: 18px 0 0;
+}
+.dice-picker button {
+  min-width: 47px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #a88b673d;
+  border-radius: 5px;
+  background: #0b1027;
+  color: #bfb3c8;
+  font-family: Cinzel, serif;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.dice-picker button:hover,
+.dice-picker button.selected {
+  color: #271b2e;
+  background: #e5b978;
+  border-color: #e5b978;
+}
+.dice-picker button:focus-visible { outline: 2px solid #fff2d6; outline-offset: 2px; }
+.dice-card { min-height: 650px; }
+.dice-stage { height: 300px; }
+@media (max-width: 560px) {
+  .dice-picker { gap: 5px; }
+  .dice-picker button { min-width: 42px; padding: 0 7px; }
+  .dice-card { min-height: 620px; }
+  .dice-stage { height: 285px; }
+}

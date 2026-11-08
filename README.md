@@ -1,26 +1,28 @@
-# D20 ao Vivo
+# Dados de RPG ao Vivo
 
-Um dado de vinte lados em 3D para rolar com amigos na mesma sala. O criador sorteia o resultado e envia a jogada para todos os participantes por WebRTC, usando o servidor público de sinalização do PeerJS.
+Role D4, D6, D8, D10, D12, D20 e D100 com os amigos na mesma sala. Cada pessoa entra com o nome do personagem. O servidor registra uma única rolagem por vez; todos recebem o mesmo tipo de dado, número e histórico.
 
 ## Jogar
 
-1. Abra o [D20 ao Vivo](https://guilhermecmt.github.io/d20-ao-vivo/).
-2. Escreva seu nome e clique em **Criar uma sala**.
-3. Copie o convite e envie para seus amigos. Todos podem clicar em **Jogar D20**; o resultado e o histórico aparecem para todos.
+1. Abra [Dados de RPG ao Vivo](https://guilhermecmt.github.io/d20-ao-vivo/).
+2. Digite o nome do seu personagem e crie uma sala.
+3. Envie o link de convite. Quem entrar pelo link informa o nome do próprio personagem e clica em **Entrar**.
+4. Escolha o dado e clique em **Jogar**. A animação termina no mesmo número para todos.
 
-O criador precisa manter a página aberta enquanto a sala estiver em uso. As salas e o histórico existem apenas durante a sessão; não há conta nem armazenamento de jogadas. Algumas redes corporativas ou restritas podem bloquear WebRTC.
+A sala continua disponível mesmo se quem a criou fechar a página. As jogadas ficam guardadas no serviço de salas; jogadores ativos aparecem durante 15 segundos após a última atualização. Compartilhe o código apenas com o grupo: qualquer pessoa com ele pode entrar e rolar.
 
-## Desenvolver
+## Código
+
+- `src/`: página e dados 3D, compilados pelo Vite e publicados no GitHub Pages.
+- `backend/`: código do serviço de salas, publicado em [Sites](https://d20-sala-api-guilherme.adroitmixer16.chatgpt.site) com Cloudflare D1.
+- `tests/`: teste de faces dos dados e teste de três personagens vendo a mesma rolagem.
 
 ```bash
-npm install
+npm ci
 npm run dev
+npm run build
+node --test tests/dice.test.mjs
+node --test tests/rooms.test.mjs
 ```
 
-`npm run build` produz os arquivos estáticos em `dist/`. O GitHub Actions publica essa pasta no GitHub Pages a cada push para `main`.
-
-## Tecnologias
-
-- Three.js para o dado 3D e a animação.
-- PeerJS/WebRTC para sincronizar a sala entre os navegadores.
-- Vite para compilar o site estático.
+O teste de salas usa `http://127.0.0.1:8787` por padrão. Defina `DICE_API_BASE` para testar o serviço publicado. Para rodar o backend localmente, entre em `backend/`, execute `npm ci`, `npm run build`, aplique a migração D1 conforme `backend/README.md` e inicie com `npm start`.
