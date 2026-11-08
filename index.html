@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c1023" />
+    <meta name="description" content="Role um D20 em uma sala ao vivo e compartilhe cada jogada com seus amigos." />
+    <title>D20 ao Vivo — uma mesa, muitas histórias</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="D20 ao Vivo, início"><span class="brand-mark">✦</span><span>D20 <em>AO VIVO</em></span></a>
+        <span class="topbar-note">UM DADO. UMA MESA. INFINITAS HISTÓRIAS.</span>
+        <span id="connection-pill" class="connection-pill"><span class="status-dot"></span><span id="connection-text">Pronto para jogar</span></span>
+      </header>
+
+      <main>
+        <section class="intro">
+          <div class="eyebrow"><span class="tiny-star">✧</span> ROLE JUNTO, DE ONDE ESTIVER <span class="tiny-star">✧</span></div>
+          <h1>Que a sorte <span>decida.</span></h1>
+          <p>Crie uma sala, convide seus amigos e veja cada D20 ganhar vida na mesma mesa, em tempo real.</p>
+        </section>
+
+        <div class="game-grid">
+          <section class="dice-card" aria-label="Dado de vinte lados">
+            <div class="corner corner-tl">✦</div><div class="corner corner-tr">✦</div><div class="corner corner-bl">✦</div><div class="corner corner-br">✦</div>
+            <div class="dice-header"><span>O DESTINO ESTÁ LANÇADO</span><span class="dice-type">D20 <span>✧</span></span></div>
+            <div id="dice-stage" class="dice-stage"><div class="stage-glow"></div><div id="dice-canvas" class="dice-canvas"></div></div>
+            <div id="result-wrap" class="result-wrap" aria-live="polite">
+              <div class="result-rule"></div>
+              <div class="result-label" id="result-label">SUA PRÓXIMA ROLAGEM</div>
+              <div class="result-number" id="result-number">—</div>
+              <div class="result-caption" id="result-caption">O próximo capítulo começa com um clique.</div>
+            </div>
+            <button id="roll-button" class="roll-button" type="button" disabled><span class="button-spark">✦</span><span>JOGAR D20</span><span class="button-arrow">↗</span></button>
+            <p class="dice-footnote">Cada resultado é sorteado uma vez e aparece para todos na sala.</p>
+          </section>
+
+          <aside class="side-panel">
+            <section class="panel-section room-panel">
+              <div class="section-heading"><span class="section-icon">⌘</span><div><div class="section-kicker">SEU PONTO DE ENCONTRO</div><h2>Sala de jogo</h2></div></div>
+              <div id="lobby">
+                <label for="nickname">Como devemos chamar você?</label>
+                <input id="nickname" maxlength="24" autocomplete="nickname" placeholder="Seu nome de aventureiro" />
+                <button id="create-button" class="primary-action" type="button">✦ &nbsp; CRIAR UMA SALA</button>
+                <div class="divider"><span>OU</span></div>
+                <label for="room-code">Já recebeu um convite?</label>
+                <div class="join-row"><input id="room-code" maxlength="12" placeholder="Código da sala" autocapitalize="characters" /><button id="join-button" type="button">ENTRAR</button></div>
+                <p class="help-text">Sem cadastro. O link é o convite.</p>
+              </div>
+              <div id="active-room" hidden>
+                <div class="room-code-label">CÓDIGO DA SALA</div>
+                <div class="room-code-box"><strong id="active-code"></strong><span id="host-badge" class="host-badge" hidden>MESTRE DA SALA</span></div>
+                <button id="copy-button" class="primary-action" type="button">↗ &nbsp; COPIAR LINK DE CONVITE</button>
+                <p id="room-status" class="help-text">Conectando à mesa...</p>
+                <button id="leave-button" class="text-action" type="button">Sair da sala</button>
+              </div>
+            </section>
+
+            <section class="panel-section players-panel"><div class="small-heading"><h3>NA MESA <span id="player-count">0</span></h3><span class="heading-glyph">✧</span></div><div id="players" class="players-empty">Crie uma sala para reunir a equipe.</div></section>
+            <section class="panel-section history-panel"><div class="small-heading"><h3>ÚLTIMAS JOGADAS</h3><span class="heading-glyph">↗</span></div><ol id="history" class="history-list"><li class="history-empty">A história ainda não começou.</li></ol></section>
+          </aside>
+        </div>
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      </main>
+      <footer><span>✦ D20 AO VIVO</span><span>Feito para histórias compartilhadas.</span></footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
