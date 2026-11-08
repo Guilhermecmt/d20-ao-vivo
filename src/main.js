@@ -8,7 +8,7 @@ const $ = (id) => document.getElementById(id);
 const ui = {
   canvas: $('dice-canvas'), picker: document.querySelector('.dice-picker'), diceType: $('dice-type'),
   roll: $('roll-button'), rollLabel: $('roll-button-label'), result: $('result-number'),
-  resultLabel: $('result-label'), resultCaption: $('result-caption'),
+  resultLabel: $('result-label'), resultCaption: $('result-caption'), footnote: $('dice-footnote'),
   create: $('create-button'), join: $('join-button'), nickname: $('nickname'),
   roomCode: $('room-code'), lobbyHelp: $('lobby-help'), lobby: $('lobby'), activeRoom: $('active-room'),
   activeCode: $('active-code'), hostBadge: $('host-badge'), copy: $('copy-button'),
@@ -24,6 +24,7 @@ let selectedSides = 20;
 let connected = false;
 let rolling = false;
 let requestingRoll = false;
+let joiningRoom = false;
 let lastSequence = -1;
 let currentRoll = null;
 let history = [];
@@ -109,8 +110,31 @@ function setSelectedDie(sides, clearResult = true) {
 }
 
 function updateButton() {
-  ui.roll.disabled = !connected || rolling || requestingRoll;
+  ui.roll.disabled = joiningRoom || (Boolean(room) && !connected) || rolling || requestingRoll;
   ui.picker.querySelectorAll('button').forEach((button) => { button.disabled = rolling; });
+  ui.create.disabled = joiningRoom || rolling;
+  ui.join.disabled = joiningRoom || rolling;
+}
+
+function randomDie(sides) {
+  const values = new Uint32Array(1);
+  const limit = Math.floor(0x100000000 / sides) * sides;
+  do { crypto.getRandomValues(values); } while (values[0] >= limit);
+  return values[0] % sides + 1;
+}
+
+function rollSolo() {
+  serverOffset = 0;
+  const roll = {
+    sequence: lastSequence + 1,
+    sides: selectedSides,
+    value: randomDie(selectedSides),
+    by: ui.nickname.value.trim().replace(/\s+/g, ' ').slice(0, 24) || 'Você',
+    at: Date.now(),
+  };
+  history.unshift(roll);
+  history = history.slice(0, 20);
+  showRoll(roll, 2400);
 }
 
 function renderMembers(players) {
@@ -238,39 +262,48 @@ async function sync() {
 }
 
 function enterRoom(code, state, creator) {
+  clearTimeout(revealTimer);
+  rolling = false;
+  currentRoll = null;
+  lastSequence = -1;
+  history = [];
   room = code;
   ui.lobby.hidden = true;
   ui.activeRoom.hidden = false;
   ui.activeCode.textContent = code;
   ui.hostBadge.hidden = !creator;
+  ui.footnote.textContent = 'Cada resultado é sorteado uma vez e aparece para todos na sala.';
   location.hash = `sala=${code}`;
   receiveState(state);
   pollTimer = setInterval(sync, 700);
 }
 
 async function begin(creator) {
+  if (rolling || joiningRoom) return;
   const name = nameFromInput();
   if (!name) return;
   const code = cleanCode(ui.roomCode.value);
   if (!creator && !code) { ui.roomCode.focus(); showToast('Digite o código da sala.'); return; }
-  ui.create.disabled = true;
-  ui.join.disabled = true;
+  joiningRoom = true;
+  updateButton();
   setConnection('Conectando...');
   try {
     const state = await request(creator ? '/api/rooms' : `/api/rooms/${code}`, { playerId, name });
     playerName = name;
     enterRoom(creator ? state.code : code, state, creator);
   } catch (error) {
-    setConnection('Pronto para jogar');
+    setConnection('Modo solo');
     showToast(error.message === 'Failed to fetch' ? 'Não foi possível conectar. Tente novamente.' : error.message);
   } finally {
-    ui.create.disabled = false;
-    ui.join.disabled = false;
+    joiningRoom = false;
+    updateButton();
   }
 }
 
 async function rollSelected() {
-  if (!connected || rolling || requestingRoll) return;
+  if (rolling || requestingRoll || joiningRoom) return;
+  if (!room) { rollSolo(); return; }
+  if (!connected) return;
   requestingRoll = true;
   updateButton();
   try {

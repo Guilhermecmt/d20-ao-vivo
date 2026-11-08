@@ -1,13 +1,15 @@
 # Dados de RPG ao Vivo
 
-Role D4, D6, D8, D10, D12, D20 e D100 com os amigos na mesma sala. Cada pessoa entra com o nome do personagem. O servidor registra uma única rolagem por vez; todos recebem o mesmo tipo de dado, número e histórico.
+Role D4, D6, D8, D10, D12, D20 e D100 sozinho ou com os amigos na mesma sala. No modo compartilhado, cada pessoa entra com o nome do personagem. O servidor registra uma única rolagem por vez; todos recebem o mesmo tipo de dado, número e histórico.
 
 ## Jogar
 
-1. Abra [Dados de RPG ao Vivo](https://guilhermecmt.github.io/d20-ao-vivo/).
-2. Digite o nome do seu personagem e crie uma sala.
+1. Abra [Dados de RPG ao Vivo](https://guilhermecmt.github.io/d20-ao-vivo/). Escolha um dado e clique em **Jogar** para usar sem sala.
+2. Para jogar com amigos, digite o nome do seu personagem e crie uma sala.
 3. Envie o link de convite. Quem entrar pelo link informa o nome do próprio personagem e clica em **Entrar**.
-4. Escolha o dado e clique em **Jogar**. A animação termina no mesmo número para todos.
+4. Escolha o dado e clique em **Jogar**. Na sala, a animação termina no mesmo número para todos.
+
+No modo solo, não é necessário nome nem conexão com o serviço de salas. O histórico solo fica apenas na página aberta.
 
 A sala continua disponível mesmo se quem a criou fechar a página. As jogadas ficam guardadas no serviço de salas; jogadores ativos aparecem durante 15 segundos após a última atualização. Compartilhe o código apenas com o grupo: qualquer pessoa com ele pode entrar e rolar.
 
