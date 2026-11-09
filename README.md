@@ -27,6 +27,8 @@ A sala continua disponível mesmo se quem a criou fechar a página. As jogadas f
 
 ## Código
 
+As decisões de tipografia e interface estão em `DESIGN.md`. O projeto inclui as skills Frontend Design e Web Design Guidelines em `.agents/skills/`, com origem registrada em `.agents/skills/SOURCES.md`. `AGENTS.md` mantém as preferências visuais e de escrita para as próximas alterações.
+
 - `src/`: página e dados 3D, compilados pelo Vite e publicados no GitHub Pages.
 - `backend/`: código do serviço de salas, publicado em [Sites](https://d20-sala-api-guilherme.adroitmixer16.chatgpt.site) com Cloudflare D1.
 - `tests/`: teste de faces dos dados e teste de três personagens vendo a mesma rolagem.

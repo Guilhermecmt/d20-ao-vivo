@@ -8,6 +8,7 @@ export function createCampaign({ notify }) {
   let pendingImport = null;
   let importRoom = '';
   let canSave = true;
+  let undoState = null;
   const node = (tag, className = '', value) => {
     const element = document.createElement(tag);
     if (className) element.className = className;
@@ -23,14 +24,16 @@ export function createCampaign({ notify }) {
     element.dataset.id = id;
     return element;
   };
-  const empty = (list, glyph, title, description) => {
+  const empty = (list, title, description) => {
     const element = node('li', 'camp-empty');
-    element.append(node('span', '', glyph), node('strong', '', title), node('p', '', description));
+    element.append(node('strong', '', title), node('p', '', description));
     list.append(element);
   };
   const numberInput = (label, value, min, max, action, id) => {
     const input = node('input');
     Object.assign(input, { type: 'number', value, min, max, step: '1' });
+    input.name = `${action}-${id}`;
+    input.autocomplete = 'off';
     input.setAttribute('aria-label', label);
     input.dataset.action = action;
     input.dataset.id = id;
@@ -38,10 +41,12 @@ export function createCampaign({ notify }) {
   };
 
   function saveStatus(saved) {
-    $('campaign-scope').textContent = `${saved ? 'Salvo neste navegador' : 'Não salvo · exporte uma cópia'} · ${room ? `caderno da sala ${room}` : 'caderno solo'}`;
+    $('campaign-scope').textContent = `${saved ? 'Salvo neste navegador.' : 'Não salvo. Exporte uma cópia.'} ${room ? `Caderno da sala ${room}.` : 'Caderno solo.'}`;
   }
 
   function save() {
+    undoState = null;
+    $('campaign-undo').hidden = true;
     if (!canSave) { saveStatus(false); return; }
     try {
       localStorage.setItem(storageKey(room), JSON.stringify(state));
@@ -53,6 +58,8 @@ export function createCampaign({ notify }) {
   }
 
   function load() {
+    undoState = null;
+    $('campaign-undo').hidden = true;
     canSave = true;
     try {
       const saved = localStorage.getItem(storageKey(room));
@@ -71,25 +78,25 @@ export function createCampaign({ notify }) {
     list.replaceChildren();
     const order = turnOrder(state);
     $('combat-count').textContent = order.length;
-    $('combat-round').textContent = `RODADA ${state.round}`;
+    $('combat-round').textContent = `Rodada ${state.round}`;
     const active = order.find(entry => entry.id === state.activeId);
-    $('combat-turn').textContent = active ? `Vez de ${active.name}` : 'O encontro aguarda seus personagens.';
-    $('combat-next').textContent = active ? 'Próximo turno →' : 'Iniciar encontro →';
+    $('combat-turn').textContent = active ? `Vez de ${active.name}` : 'Adicione participantes para começar.';
+    $('combat-next').textContent = active ? 'Próximo turno' : 'Iniciar encontro';
     $('combat-next').disabled = !order.length;
     $('combat-reset').disabled = !order.length;
-    if (!order.length) empty(list, '⚔', 'A mesa está pronta.', 'Inclua personagens e adversários para acompanhar a iniciativa, os pontos de vida e cada turno.');
+    if (!order.length) empty(list, 'Nenhum participante neste encontro.', 'Use o formulário acima para adicionar aliados e adversários.');
     order.forEach(entry => {
       const row = node('li', `combat-row${entry.id === state.activeId ? ' is-active' : ''}${entry.hp === 0 ? ' is-down' : ''}`);
       if (entry.id === state.activeId) row.setAttribute('aria-current', 'true');
       const initiative = node('div', 'combat-initiative');
-      const initiativeLabel = node('label', '', 'INICIATIVA');
+      const initiativeLabel = node('label', '', 'Iniciativa');
       const initiativeInput = numberInput(`Iniciativa de ${entry.name}`, entry.initiative, -99, 999, 'initiative', entry.id);
       initiativeInput.id = `initiative-${entry.id}`;
       initiativeLabel.htmlFor = initiativeInput.id;
       initiative.append(initiativeLabel, initiativeInput);
       const person = node('div', 'combat-person');
       person.append(node('strong', 'combat-name', entry.name), node('span', `combat-kind ${entry.kind}`, entry.kind === 'enemy' ? 'Adversário' : 'Aliado'));
-      if (entry.id === state.activeId) person.append(node('span', 'turn-indicator', '✦ TURNO ATUAL'));
+      if (entry.id === state.activeId) person.append(node('span', 'turn-indicator', 'Turno atual'));
       const hp = node('div', 'hp-control');
       const controls = node('div', 'hp-inputs');
       const damage = button(`Tirar 1 PV de ${entry.name}`, '−', 'damage', entry.id);
@@ -101,11 +108,12 @@ export function createCampaign({ notify }) {
       meter.max = entry.maxHp;
       meter.value = entry.hp;
       meter.setAttribute('aria-label', `Vida de ${entry.name}`);
-      hp.append(node('span', 'hp-label', 'PONTOS DE VIDA'), controls, meter);
+      hp.append(node('span', 'hp-label', 'Pontos de vida'), controls, meter);
       const condition = node('div', 'condition-field');
-      const conditionLabel = node('label', '', 'CONDIÇÃO');
+      const conditionLabel = node('label', '', 'Condição');
       const select = node('select');
       select.id = `condition-${entry.id}`;
+      select.name = select.id;
       conditionLabel.htmlFor = select.id;
       select.setAttribute('aria-label', `Condição de ${entry.name}`);
       select.dataset.action = 'condition';
@@ -130,12 +138,13 @@ export function createCampaign({ notify }) {
     const done = state.quests.filter(entry => entry.done).length;
     $('quest-count').textContent = state.quests.length - done;
     $('quest-progress').textContent = `${done} de ${state.quests.length} concluídas`;
-    if (!state.quests.length) empty(list, '✧', 'Toda aventura tem um propósito.', 'Registre a primeira missão e marque cada conquista do grupo.');
+    if (!state.quests.length) empty(list, 'Nenhuma missão registrada.', 'Adicione um objetivo. Marque a caixa ao concluí-lo.');
     state.quests.forEach(entry => {
       const row = node('li', `quest-row${entry.done ? ' done' : ''}`);
       const label = node('label');
       const check = node('input');
       check.type = 'checkbox';
+      check.name = `quest-${entry.id}`;
       check.checked = entry.done;
       check.dataset.action = 'quest-done';
       check.dataset.id = entry.id;
@@ -151,7 +160,7 @@ export function createCampaign({ notify }) {
     const list = $('item-list');
     list.replaceChildren();
     $('item-count').textContent = state.items.length;
-    if (!state.items.length) empty(list, '♜', 'Há espaço para novas descobertas.', 'Guarde provisões, moedas e tesouros. Registre quem carrega cada item.');
+    if (!state.items.length) empty(list, 'O inventário está vazio.', 'Adicione um item, sua quantidade e quem está carregando.');
     state.items.forEach(entry => {
       const row = node('li', 'item-row');
       const description = node('div', 'item-description');
@@ -164,7 +173,7 @@ export function createCampaign({ notify }) {
       quantity.append(decrease, numberInput(`Quantidade de ${entry.name}`, entry.quantity, 0, 9999, 'quantity', entry.id), increase);
       const remove = button(`Remover item: ${entry.name}`, '×', 'remove-item', entry.id);
       remove.classList.add('remove-button');
-      row.append(node('span', 'item-symbol', '✧'), description, quantity, remove);
+      row.append(description, quantity, remove);
       list.append(row);
     });
   }
@@ -178,16 +187,22 @@ export function createCampaign({ notify }) {
   }
 
   // Restore keyboard focus after rows are rebuilt, including after reordering.
-  function update(renderList) {
+  function update(renderList, beforeRemoval = null) {
     const focused = document.activeElement;
     const action = focused?.dataset.action;
     const id = focused?.dataset.id;
     save();
+    if (beforeRemoval) { undoState = beforeRemoval; $('campaign-undo').hidden = false; }
     renderList();
     if (action && id) {
       const target = [...$('campaign').querySelectorAll('[data-action]')]
         .find(element => element.dataset.action === action && element.dataset.id === id);
       if (target && !target.disabled) target.focus({ preventScroll: true });
+      else if (beforeRemoval) {
+        const fallback = [...$('campaign').querySelectorAll('button[data-action]')].find(element => element.dataset.action === action)
+          || (action === 'remove-combatant' ? $('combat-name') : action === 'remove-quest' ? $('quest-title') : $('item-name'));
+        fallback.focus({ preventScroll: true });
+      }
     }
   }
 
@@ -263,10 +278,10 @@ export function createCampaign({ notify }) {
     const { action, id } = target.dataset;
     const fighter = state.combatants.find(entry => entry.id === id);
     const item = state.items.find(entry => entry.id === id);
-    if (action === 'remove-combatant' && fighter) { removeCombatant(state, id); update(renderCombat); }
+    if (action === 'remove-combatant' && fighter) { const before = structuredClone(state); removeCombatant(state, id); update(renderCombat, before); }
     else if (['damage', 'heal'].includes(action) && fighter) { changeHp(fighter, action === 'damage' ? -1 : 1); update(renderCombat); }
-    else if (action === 'remove-quest') { state.quests = state.quests.filter(entry => entry.id !== id); update(renderQuests); }
-    else if (action === 'remove-item') { state.items = state.items.filter(entry => entry.id !== id); update(renderItems); }
+    else if (action === 'remove-quest') { const before = structuredClone(state); state.quests = state.quests.filter(entry => entry.id !== id); update(renderQuests, before); }
+    else if (action === 'remove-item') { const before = structuredClone(state); state.items = state.items.filter(entry => entry.id !== id); update(renderItems, before); }
     else if (['use-item', 'add-item'].includes(action) && item) { item.quantity = integer(item.quantity + (action === 'use-item' ? -1 : 1), 0, 9999); update(renderItems); }
   });
   $('campaign').addEventListener('change', event => {
@@ -283,6 +298,14 @@ export function createCampaign({ notify }) {
       const item = state.items.find(entry => entry.id === id);
       if (item) { item.quantity = integer(event.target.value, 0, 9999); update(renderItems); }
     }
+  });
+
+  $('campaign-undo').addEventListener('click', () => {
+    if (!undoState) return;
+    state = undoState;
+    update(render);
+    tabs.find(tab => tab.getAttribute('aria-selected') === 'true').focus({ preventScroll: true });
+    notify('Exclusão desfeita.');
   });
 
   $('campaign-export').addEventListener('click', () => {
@@ -324,7 +347,7 @@ export function createCampaign({ notify }) {
       canSave = true;
       save();
       render();
-      notify('Campanha importada. Boa aventura!');
+      notify('Campanha importada.');
     }
     pendingImport = null;
   });

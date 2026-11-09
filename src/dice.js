@@ -85,7 +85,7 @@ function model(sides, labels) {
   if (faces.length !== labels.length) throw new Error(`D${sides}: faces incorretas`);
   const group = new THREE.Group();
   group.add(new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-    color: 0x6740a4, metalness: 0.32, roughness: 0.30, flatShading: true, side: THREE.DoubleSide,
+    color: 0x68824b, metalness: 0.25, roughness: 0.42, flatShading: true, side: THREE.DoubleSide,
   })));
   group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0xffd69a, transparent: true, opacity: 0.95 })));
   faces.forEach((face, index) => {
@@ -106,11 +106,11 @@ export function createDiceStage(container) {
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
   camera.position.set(0, 5.1, 8.2);
   camera.lookAt(0, 0.5, 0);
-  scene.add(new THREE.AmbientLight(0xa8a4e6, 2));
+  scene.add(new THREE.AmbientLight(0xc8d4b8, 2));
   const key = new THREE.DirectionalLight(0xffdfae, 5);
   key.position.set(-4, 7, 6);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x9877ec, 4);
+  const rim = new THREE.DirectionalLight(0xa0bb8b, 4);
   rim.position.set(5, 2, -4);
   scene.add(rim);
 
@@ -124,14 +124,16 @@ export function createDiceStage(container) {
     container.append(renderer.domElement);
   } catch {
     const fallback = document.createElement('div');
-    fallback.textContent = '✦ DADOS ✦';
-    fallback.style.cssText = 'height:100%;display:grid;place-items:center;font:700 58px Cinzel,serif;color:#d7ad77';
+    fallback.textContent = 'D20';
+    fallback.className = 'dice-fallback';
     container.append(fallback);
   }
 
   let currentSides = 0;
   let models = [];
   let animation = null;
+  let needsRender = true;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   function disposeModel(entry) {
     scene.remove(entry.group);
@@ -158,6 +160,9 @@ export function createDiceStage(container) {
     }
     models.forEach((entry) => scene.add(entry.group));
     currentSides = sides;
+    needsRender = true;
+    const fallback = container.querySelector('.dice-fallback');
+    if (fallback) fallback.textContent = `D${sides}`;
   }
 
   function target(entry, index) {
@@ -168,6 +173,7 @@ export function createDiceStage(container) {
   function settle(sides, value) {
     setDice(sides);
     animation = null;
+    needsRender = true;
     const indices = faceIndicesFor(sides, value);
     models.forEach((entry, i) => {
       entry.group.quaternion.copy(target(entry, indices[i]));
@@ -177,6 +183,7 @@ export function createDiceStage(container) {
   }
 
   function roll(sides, value, duration) {
+    if (reducedMotion.matches) { settle(sides, value); return; }
     setDice(sides);
     const indices = faceIndicesFor(sides, value);
     animation = {
@@ -196,7 +203,9 @@ export function createDiceStage(container) {
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      needsRender = true;
     }
+    if (!animation && !needsRender) return;
     if (animation) {
       const t = Math.min((now - animation.start) / animation.duration, 1);
       const ease = 1 - Math.pow(1 - t, 4);
@@ -210,12 +219,9 @@ export function createDiceStage(container) {
         animation.entries.forEach(({ entry, to }) => { entry.group.quaternion.copy(to); entry.group.position.y = 0; entry.settled = true; });
         animation = null;
       }
-    } else if (currentSides) {
-      models.forEach((entry, i) => {
-        if (!entry.settled) entry.group.rotation.y += 0.0022 * (i % 2 ? -1 : 1);
-      });
     }
     renderer.render(scene, camera);
+    needsRender = false;
   }
 
   setDice(20);

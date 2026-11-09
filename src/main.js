@@ -102,13 +102,13 @@ function setSelectedDie(sides, clearResult = true) {
     button.classList.toggle('selected', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
-  ui.diceType.innerHTML = `D${sides} <span>✧</span>`;
-  ui.rollLabel.textContent = `JOGAR D${sides}`;
+  ui.diceType.textContent = `D${sides}`;
+  ui.rollLabel.textContent = `Rolar D${sides}`;
   stage.setDice(sides);
   if (clearResult) {
-    ui.result.textContent = '—';
+    ui.result.textContent = '?';
     ui.result.className = 'result-number';
-    ui.resultLabel.textContent = 'SUA PRÓXIMA ROLAGEM';
+    ui.resultLabel.textContent = 'Pronto para rolar';
     ui.resultCaption.textContent = `Pronto para rolar o D${sides}.`;
   }
 }
@@ -146,7 +146,7 @@ function renderMembers(players) {
   ui.players.replaceChildren();
   if (!players.length) {
     ui.players.className = 'players-empty';
-    ui.players.textContent = 'Aguardando personagens...';
+    ui.players.textContent = 'Aguardando personagens…';
     return;
   }
   ui.players.className = 'player-list';
@@ -165,7 +165,7 @@ function renderHistory() {
   if (!visible.length) {
     const item = document.createElement('li');
     item.className = 'history-empty';
-    item.textContent = 'A história ainda não começou.';
+    item.textContent = 'Suas rolagens aparecem aqui.';
     ui.history.append(item);
     return;
   }
@@ -200,7 +200,7 @@ function finishRoll(sequence) {
   stage.settle(roll.sides, roll.value);
   ui.result.textContent = String(roll.value);
   ui.result.className = `result-number ${roll.value === roll.sides ? 'critical' : roll.value === 1 ? 'fumble' : ''}`;
-  ui.resultLabel.textContent = roll.value === roll.sides ? 'RESULTADO MÁXIMO!' : roll.value === 1 ? 'RESULTADO MÍNIMO' : 'O DESTINO ESCOLHEU';
+  ui.resultLabel.textContent = roll.value === roll.sides ? 'Resultado máximo' : roll.value === 1 ? 'Resultado mínimo' : 'Resultado da rolagem';
   ui.resultCaption.textContent = `${roll.by} tirou ${roll.value} no D${roll.sides}.`;
   rolling = false;
   updateButton();
@@ -220,10 +220,10 @@ function showRoll(roll, duration) {
   }
   rolling = true;
   updateButton();
-  ui.result.textContent = '✦';
+  ui.result.textContent = '…';
   ui.result.className = 'result-number';
-  ui.resultLabel.textContent = `D${roll.sides} ROLANDO`;
-  ui.resultCaption.textContent = `${roll.by} desafiou o destino...`;
+  ui.resultLabel.textContent = `Rolando D${roll.sides}`;
+  ui.resultCaption.textContent = `${roll.by} está rolando.`;
   stage.roll(roll.sides, roll.value, remaining);
   revealTimer = setTimeout(() => finishRoll(roll.sequence), remaining);
 }
@@ -256,8 +256,8 @@ async function sync() {
     failures++;
     if (failures >= 3) {
       connected = false;
-      setConnection('Reconectando...', 'error');
-      ui.roomStatus.textContent = 'Sem conexão com a sala. Tentando novamente...';
+      setConnection('Reconectando…', 'error');
+      ui.roomStatus.textContent = 'Sem conexão com a sala. Tentando novamente…';
       updateButton();
     }
   } finally {
@@ -291,7 +291,7 @@ async function begin(creator) {
   if (!creator && !code) { ui.roomCode.focus(); showToast('Digite o código da sala.'); return; }
   joiningRoom = true;
   updateButton();
-  setConnection('Conectando...');
+  setConnection('Conectando…');
   try {
     const state = await request(creator ? '/api/rooms' : `/api/rooms/${code}`, { playerId, name });
     playerName = name;
@@ -324,6 +324,10 @@ async function rollSelected() {
 }
 
 ui.create.addEventListener('click', () => begin(true));
+document.querySelector('.skip-link').addEventListener('click', (event) => {
+  event.preventDefault();
+  $('main-content').focus();
+});
 ui.join.addEventListener('click', () => begin(false));
 ui.roll.addEventListener('click', rollSelected);
 ui.picker.addEventListener('click', (event) => {
