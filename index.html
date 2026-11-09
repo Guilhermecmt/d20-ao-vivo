@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a0d1b" />
-    <meta name="description" content="Role todos os dados de RPG em uma sala ao vivo e compartilhe cada jogada com seus amigos." />
+    <meta name="description" content="Role dados de RPG em uma sala ao vivo e organize sua campanha com iniciativa, pontos de vida, missões e inventário." />
     <title>Dados de RPG ao Vivo — uma mesa, muitas histórias</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,6 +23,7 @@
           <div class="eyebrow"><span class="tiny-star">✧</span> SUA PRÓXIMA AVENTURA COMEÇA AQUI <span class="tiny-star">✧</span></div>
           <h1>Que a sorte <span>decida.</span></h1>
           <p>Role sozinho agora mesmo ou crie uma sala para compartilhar cada jogada com seus amigos em tempo real.</p>
+          <button class="campaign-anchor" id="campaign-open" type="button">EXPLORAR O CADERNO DE CAMPANHA <span aria-hidden="true">↓</span></button>
         </section>
 
         <div class="game-grid">
@@ -68,6 +69,52 @@
             <section class="panel-section history-panel"><div class="small-heading"><h3>ÚLTIMAS JOGADAS</h3><span class="heading-glyph">↗</span></div><ol id="history" class="history-list"><li class="history-empty">A história ainda não começou.</li></ol></section>
           </aside>
         </div>
+        <section id="campaign" class="campaign" aria-labelledby="campaign-heading">
+          <div class="campaign-heading">
+            <div><div class="section-kicker">ALÉM DA SORTE, A HISTÓRIA</div><h2 id="campaign-heading">Seu caderno de campanha</h2><p>Organize os encontros, acompanhe as descobertas e cuide da bagagem.</p></div>
+          </div>
+          <div class="campaign-card">
+            <div class="campaign-toolbar">
+              <div class="campaign-identity"><label for="campaign-name">NOME DA CAMPANHA</label><input id="campaign-name" maxlength="64" placeholder="Uma aventura para lembrar" /><span id="campaign-scope" class="campaign-save" role="status">Salvo neste navegador · caderno solo</span></div>
+              <div class="campaign-backup"><button id="campaign-export" class="camp-button" type="button">↓ Exportar</button><button id="campaign-import" class="camp-button" type="button">↑ Importar</button><input id="campaign-file" type="file" accept=".json,application/json" hidden /></div>
+            </div>
+            <div id="campaign-tabs" class="campaign-tabs" role="tablist" aria-label="Ferramentas de campanha">
+              <button id="tab-combat" role="tab" aria-selected="true" aria-controls="panel-combat" tabindex="0" type="button"><span aria-hidden="true">⚔</span> Encontro <span id="combat-count" class="camp-count">0</span></button>
+              <button id="tab-journal" role="tab" aria-selected="false" aria-controls="panel-journal" tabindex="-1" type="button"><span aria-hidden="true">✧</span> Diário <span id="quest-count" class="camp-count">0</span></button>
+              <button id="tab-inventory" role="tab" aria-selected="false" aria-controls="panel-inventory" tabindex="-1" type="button"><span aria-hidden="true">♜</span> Inventário <span id="item-count" class="camp-count">0</span></button>
+            </div>
+
+            <section id="panel-combat" class="campaign-panel" role="tabpanel" aria-labelledby="tab-combat" tabindex="0">
+              <div class="camp-panel-heading"><div><h3>Todos têm sua vez.</h3><p>Adicione aliados e criaturas. A maior iniciativa começa.</p></div><span class="camp-badge">CONTROLE DE ENCONTRO</span></div>
+              <form id="combat-form" class="camp-form combat-form">
+                <div class="camp-field"><label for="combat-name">Personagem ou criatura</label><input id="combat-name" maxlength="40" placeholder="Ex.: Lyra, a arqueira" required /></div>
+                <div class="camp-field"><label for="combat-kind">Grupo</label><select id="combat-kind"><option value="ally">Aliado</option><option value="enemy">Adversário</option></select></div>
+                <div class="camp-field"><label for="combat-initiative">Iniciativa</label><input id="combat-initiative" type="number" min="-99" max="999" value="10" required /></div>
+                <div class="camp-field"><label for="combat-hp">PV máximos</label><input id="combat-hp" type="number" min="1" max="9999" value="20" required /></div>
+                <button class="camp-button camp-primary" type="submit">+ Adicionar</button>
+              </form>
+              <div class="turn-toolbar"><div><span class="round-badge" id="combat-round">RODADA 1</span><span id="combat-turn" class="turn-label" aria-live="polite">O encontro aguarda seus personagens.</span></div><div class="turn-actions"><button id="combat-reset" class="camp-button" type="button" disabled>Reiniciar turnos</button><button id="combat-next" class="camp-button camp-primary" type="button" disabled>Iniciar encontro →</button></div></div>
+              <ol id="combat-list" class="combat-list"></ol>
+              <p class="camp-hint">Ajuste a iniciativa e os PV a qualquer momento. As condições são lembretes; você decide seus efeitos.</p>
+            </section>
+
+            <section id="panel-journal" class="campaign-panel" role="tabpanel" aria-labelledby="tab-journal" tabindex="0" hidden>
+              <div class="camp-panel-heading"><div><h3>Nenhuma pista fica para trás.</h3><p>Do primeiro rumor à última página da aventura.</p></div><span class="camp-badge">MISSÕES & MEMÓRIAS</span></div>
+              <div class="journal-grid">
+                <div><h4 class="camp-subheading">Missões do grupo <span id="quest-progress">0 concluídas</span></h4><form id="quest-form" class="camp-form inline-form"><div class="camp-field"><label class="visually-hidden" for="quest-title">Nova missão</label><input id="quest-title" maxlength="160" placeholder="Qual é o próximo objetivo?" required /></div><button class="camp-button camp-primary" type="submit">+ Missão</button></form><ul id="quest-list" class="quest-list"></ul></div>
+                <div class="notes-panel"><label class="camp-subheading" for="campaign-notes">Notas da sessão <span>Salvamento automático</span></label><textarea id="campaign-notes" maxlength="20000" rows="9" placeholder="Pessoas que conhecemos, lugares por explorar, pistas e aquele detalhe que ninguém pode esquecer..."></textarea><p class="camp-hint">Guarde nomes de NPCs, acontecimentos e ideias para o próximo encontro.</p></div>
+              </div>
+            </section>
+
+            <section id="panel-inventory" class="campaign-panel" role="tabpanel" aria-labelledby="tab-inventory" tabindex="0" hidden>
+              <div class="camp-panel-heading"><div><h3>O que a aventura deixou.</h3><p>Poções, provisões, moedas e os tesouros que contam histórias.</p></div><span class="camp-badge">BAGAGEM DO GRUPO</span></div>
+              <form id="item-form" class="camp-form item-form"><div class="camp-field"><label for="item-name">Item ou recurso</label><input id="item-name" maxlength="80" placeholder="Ex.: Poção de cura" required /></div><div class="camp-field"><label for="item-owner">Com quem está?</label><input id="item-owner" maxlength="40" placeholder="Grupo ou personagem" /></div><div class="camp-field"><label for="item-quantity">Quantidade</label><input id="item-quantity" type="number" min="1" max="9999" value="1" required /></div><button class="camp-button camp-primary" type="submit">+ Guardar item</button></form>
+              <ul id="item-list" class="item-list"></ul>
+            </section>
+            <div class="campaign-bottom"><span aria-hidden="true">✦</span><p>O caderno fica neste navegador, separado por sala. Exporte uma cópia para guardar ou levar a outra pessoa.</p></div>
+          </div>
+          <dialog id="campaign-import-dialog" class="camp-dialog" aria-labelledby="import-heading"><form method="dialog"><div class="section-kicker">CONTINUAR UMA HISTÓRIA</div><h3 id="import-heading">Importar campanha?</h3><p id="import-description"></p><p>O caderno atual será substituído. Exporte uma cópia antes de continuar se quiser guardá-lo.</p><div class="dialog-actions"><button class="camp-button" value="cancel">Cancelar</button><button class="camp-button camp-primary" value="import">Importar campanha</button></div></form></dialog>
+        </section>
         <div id="toast" class="toast" role="status" aria-live="polite"></div>
       </main>
       <footer><span>✦ DADOS AO VIVO</span><span>Feito para histórias compartilhadas.</span></footer>

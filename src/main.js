@@ -1,5 +1,6 @@
 import './style.css';
 import { createDiceStage } from './dice.js';
+import { createCampaign } from './campaign.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://d20-sala-api-guilherme.adroitmixer16.chatgpt.site';
 const DICE = [4, 6, 8, 10, 12, 20, 100];
@@ -34,8 +35,10 @@ let toastTimer = null;
 let syncInFlight = false;
 let failures = 0;
 
-const savedName = localStorage.getItem('d20-character-name');
-if (savedName) ui.nickname.value = savedName;
+try {
+  const savedName = localStorage.getItem('d20-character-name');
+  if (savedName) ui.nickname.value = savedName;
+} catch { /* The table remains usable when browser storage is unavailable. */ }
 
 function showToast(message) {
   ui.toast.textContent = message;
@@ -43,6 +46,8 @@ function showToast(message) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => ui.toast.classList.remove('show'), 3200);
 }
+
+const campaign = createCampaign({ notify: showToast });
 
 function setConnection(message, status = '') {
   ui.connectionText.textContent = message;
@@ -56,7 +61,7 @@ function nameFromInput() {
     showToast('Escreva o nome do seu personagem.');
     return null;
   }
-  localStorage.setItem('d20-character-name', name);
+  try { localStorage.setItem('d20-character-name', name); } catch { /* Name still works for this session. */ }
   return name;
 }
 
@@ -267,6 +272,7 @@ function enterRoom(code, state, creator) {
   lastSequence = -1;
   history = [];
   room = code;
+  campaign.setRoom(code);
   ui.lobby.hidden = true;
   ui.activeRoom.hidden = false;
   ui.activeCode.textContent = code;

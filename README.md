@@ -11,6 +11,18 @@ Role D4, D6, D8, D10, D12, D20 e D100 sozinho ou com os amigos na mesma sala. No
 
 No modo solo, não é necessário nome nem conexão com o serviço de salas. O histórico solo fica apenas na página aberta.
 
+## Caderno de campanha
+
+Logo abaixo dos dados, o caderno reúne três ferramentas independentes de sistema:
+
+- **Encontro:** aliados e adversários em ordem de iniciativa, pontos de vida, condições, turno atual e contador de rodadas. Edite a iniciativa ou os PV diretamente e use os botões para dano e cura de um ponto. Reiniciar turnos mantém os participantes e seus PV.
+- **Diário:** missões com marcação de conclusão e anotações da sessão com salvamento automático.
+- **Inventário:** itens, quantidades e o personagem responsável por carregá-los.
+
+O caderno é salvo no armazenamento local deste navegador e tem um espaço separado para o modo solo e para cada código de sala. Ele **não é sincronizado entre jogadores ou dispositivos**. Use **Exportar** para baixar uma cópia JSON e **Importar** para carregá-la em outro navegador; a importação pede confirmação antes de substituir o caderno atual. Apagar os dados do navegador também apaga os cadernos, então exporte cópias das campanhas que quiser guardar. Se o armazenamento estiver indisponível, a página avisa e ainda permite exportar as alterações.
+
+As condições são lembretes e não aplicam regras automaticamente. Participantes com zero PV continuam na ordem de iniciativa para que a mesa decida como lidar com eles.
+
 A sala continua disponível mesmo se quem a criou fechar a página. As jogadas ficam guardadas no serviço de salas; jogadores ativos aparecem durante 15 segundos após a última atualização. Compartilhe o código apenas com o grupo: qualquer pessoa com ele pode entrar e rolar.
 
 ## Código
@@ -24,6 +36,7 @@ npm ci
 npm run dev
 npm run build
 node --test tests/dice.test.mjs
+node --test tests/campaign.test.mjs
 node --test tests/rooms.test.mjs
 ```
 
