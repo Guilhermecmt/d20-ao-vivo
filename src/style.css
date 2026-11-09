@@ -49,7 +49,8 @@ p { text-wrap: pretty; }
 .skip-link { position: fixed; top: -100px; left: 20px; z-index: 20; padding: 14px 18px; background: var(--accent-hover); color: var(--brand); border-radius: 4px; }
 .skip-link:focus { top: 16px; }
 .topbar { min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }
-.brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; font: 600 22px/1.2 var(--font-heading); white-space: nowrap; }
+.brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; font: 600 22px/1.2 var(--font-heading); min-width: 0; white-space: normal; }
+.brand > span { text-wrap: balance; }
 .brand:hover { color: var(--accent-hover); }
 .brand-mark { width: 31px; height: 36px; flex-shrink: 0; stroke: var(--accent); stroke-width: 1.5; }
 .topbar-note { color: var(--muted); font-size: 13px; }
