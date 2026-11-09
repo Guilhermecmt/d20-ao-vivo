@@ -12,6 +12,7 @@ As instruções do usuário têm prioridade sobre estas orientações e sobre as
 
 - Criar uma interface específica para uma mesa de RPG, com decisões visuais deliberadas.
 - Usar Bitter nos títulos e Public Sans nos controles e textos. Não voltar a Cinzel, DM Sans ou trocar tudo por Inter sem um novo pedido.
+- Usar a base roxa `#6410C9`, amarelo `#FFD54A` nos destaques e `#E9E9E9` nos elementos neutros. Reutilizar as variáveis de cor de `src/style.css`.
 - Escrever em português brasileiro, com frases diretas e caixa normal.
 - Evitar travessões desnecessários, frases promocionais, slogans, metáforas em estados vazios e setas decorativas nos botões.
 - Ícones precisam representar uma ação ou informação. Evitar estrelas, brilhos e enfeites repetidos.

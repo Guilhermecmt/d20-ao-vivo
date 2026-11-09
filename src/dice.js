@@ -67,11 +67,11 @@ function numberTexture(value) {
   canvas.width = 256;
   canvas.height = 256;
   const context = canvas.getContext('2d');
-  context.fillStyle = '#fff0d4';
+  context.fillStyle = '#E9E9E9';
   context.font = `bold ${String(value).length > 2 ? 110 : String(value).length > 1 ? 138 : 165}px Georgia, serif`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  context.shadowColor = '#ffffff55';
+  context.shadowColor = '#E9E9E955';
   context.shadowBlur = 10;
   context.fillText(String(value), 128, 136);
   const texture = new THREE.CanvasTexture(canvas);
@@ -85,9 +85,9 @@ function model(sides, labels) {
   if (faces.length !== labels.length) throw new Error(`D${sides}: faces incorretas`);
   const group = new THREE.Group();
   group.add(new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-    color: 0x68824b, metalness: 0.25, roughness: 0.42, flatShading: true, side: THREE.DoubleSide,
+    color: 0x6410C9, metalness: 0.25, roughness: 0.42, flatShading: true, side: THREE.DoubleSide,
   })));
-  group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0xffd69a, transparent: true, opacity: 0.95 })));
+  group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0xFFD54A, transparent: true, opacity: 0.95 })));
   faces.forEach((face, index) => {
     const label = new THREE.Mesh(
       new THREE.PlaneGeometry(labels[index] === '00' ? 0.82 : 0.73, 0.73),
@@ -106,11 +106,11 @@ export function createDiceStage(container) {
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
   camera.position.set(0, 5.1, 8.2);
   camera.lookAt(0, 0.5, 0);
-  scene.add(new THREE.AmbientLight(0xc8d4b8, 2));
-  const key = new THREE.DirectionalLight(0xffdfae, 5);
+  scene.add(new THREE.AmbientLight(0xE9E9E9, 2));
+  const key = new THREE.DirectionalLight(0xFFF3CE, 5);
   key.position.set(-4, 7, 6);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xa0bb8b, 4);
+  const rim = new THREE.DirectionalLight(0xD9B5FF, 4);
   rim.position.set(5, 2, -4);
   scene.add(rim);
 

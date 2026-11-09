@@ -8,12 +8,14 @@ A referência é uma mesa de jogo com dados e caderno, em vez de uma página pro
 
 Paleta:
 
-- Fundo: `#17231e`, verde escuro.
-- Bandeja de dados: `#22382d`.
-- Caderno: `#1f3026`.
-- Texto principal: `#eeeae0`.
-- Texto secundário: `#b1bcb3`.
-- Ação principal: `#d9bd79`, latão.
+- Base e fundo: `#6410C9`, roxo definido pelo usuário.
+- Painéis e bandeja: `#4D0D9B`, com áreas elevadas em `#570EAE`.
+- Campos e áreas internas: `#35076D` e `#3D087D`.
+- Textos e elementos neutros: `#E9E9E9`.
+- Texto secundário: `#DED3EB`.
+- Ação principal e destaques: `#FFD54A`, amarelo quente, com hover em `#FFE380`.
+
+O roxo é a base de toda a página. O amarelo destaca rolagens, ações principais, foco e turno atual. O cinza claro aparece nos títulos, nos textos e nos botões secundários. As cores ficam centralizadas nas variáveis de `src/style.css`; os componentes do caderno reutilizam essas variáveis. O dado 3D usa o mesmo roxo, arestas amarelas e números em cinza claro.
 
 ## Tipografia
 
